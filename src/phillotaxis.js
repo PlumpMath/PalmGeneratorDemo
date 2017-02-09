@@ -19,6 +19,30 @@ export function phyllotaxisConical(i, angleInRadians, spread, extrude){
     return {x, y, z};
 }
 
+export function phyllotaxisOnCurve(i, angleInRadians, spread, curve){
+    let vertexOnCurve = curve.vertices[i];
+    let curve_start = curve.vertices[0];
+    // the vertices on the trunk will be looking at some vertices before them
+    // "some vertices" is defined by a percentage value, like, the vertices
+    // of the trunk should look at a point the 10% of the curve behind them.
+    // Consider that the palms grows in the opposite direction. This palm grow from the top
+    // to the bottom, not like real palms. Also the curve has to be defined as a curve that moves from the top to
+    // the bottom
+    let percent_of_the_curve = Math.floor(curve.vertices.length * 0.02);
+    let prev = (i < percent_of_the_curve )? curve_start : curve.vertices[i-percent_of_the_curve];
+    console.log(percent_of_the_curve);
+    //console.log(curve.vertices.length);
+    //console.log(vertexOnCurve.z);
+
+    let current_angle = i * angleInRadians;
+    let radius = spread * Math.sqrt(i);
+    let x = radius * Math.cos(current_angle)+ vertexOnCurve.x;
+    let y = radius * Math.sin(current_angle)+ vertexOnCurve.y;
+    let z = vertexOnCurve.z;
+    return {x, y, z, prev, curve_start};
+}
+
+
 export function phyllotaxisApple(i, angle, spread, tot){
     let inc = Math.PI / tot;
     let current_angle = i * inc;
