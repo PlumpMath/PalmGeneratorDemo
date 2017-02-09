@@ -119,6 +119,7 @@ function render(){
                          gui.params.length_stem,
                          gui.params.width_stem,
                          gui.params.leaf_width,
+                         gui.params.leaf_up,
                          gui.params.density,
                          gui.params.curvature,
                          gui.params.curvature_border,
