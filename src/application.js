@@ -10,7 +10,7 @@ import {PointLights} from './pointLights.js';
 const radius = 5; //this number is used to create the geometried and to position the Leafs correctly
 const geometries = new CollectionGeometries(radius);
 const materials = new CollectionMaterials;
-const material = materials["phong"];
+const material = materials["lambert"];
 const gui = new Gui(material);
 
 //setup the scene and the camera
@@ -52,22 +52,23 @@ window.addEventListener('resize', function() {
     camera.updateProjectionMatrix();
 });
 
-let curve = createCurve();
-curveGeometry.vertices = curve.getPoints( gui.params.num );
-var materialCurve = new THREE.LineBasicMaterial( { color : 0xff0000 } );
-// Create the final object to add to the scene
-var curveObject = new THREE.Line( curveGeometry, materialCurve );
-scene.add(curveObject);
+// curve
+// let curve = createCurve();
+// curveGeometry.vertices = curve.getPoints( gui.params.num );
+// var materialCurve = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+// var curveObject = new THREE.Line( curveGeometry, materialCurve );
+// scene.add(curveObject);
 
-function createCurve(){
-    //Create a closed wavey loop
-    var curve = new THREE.CatmullRomCurve3( [
-	      new THREE.Vector3( 0, 0, 0 ),
-	      new THREE.Vector3( -10, 0, -30 ),
-	      new THREE.Vector3( 10, 0, -100 )
-    ] );
-    return curve;
-}
+// function createCurve(){
+//     //Create a closed wavey loop
+//     var curve = new THREE.CatmullRomCurve3( [
+// 	      new THREE.Vector3( 0, 0, 0 ),
+// 	      new THREE.Vector3( -10, 0, -30 ),
+// 	      new THREE.Vector3( 10, 0, -100 )
+//     ] );
+//     return curve;
+// }
+// end curve
 
 function populatePalmOnCurve(foliage_geometry, trunk_geometry, selected_material, radius, curve_geometry) {
     let PItoDeg = (Math.PI/180.0);
@@ -107,24 +108,22 @@ function populatePalmOnCurve(foliage_geometry, trunk_geometry, selected_material
 
 function transformIntoLeaf(object, iter, angleInRadians, radius){
     let PItoDeg = (Math.PI/180.0);
-    //the scale ratio is a value between 0.001 and 1.
+    // the scale ratio is a value between 0.001 and 1.
     // It is 0.0001 for the first leaves, and 1 for the last ones
     let ratio = Math.abs(iter/gui.params.foliage_start_at);
-    //this is to avaoid a scaleRatio of 0, that would cause a warning while scaling
+    // this is to avaoid a scaleRatio of 0, that would cause a warning while scaling
     // an object for 0
     let scaleRatio = ratio === 0 ? 0.001 : ratio;
     object.rotateZ( iter* angleInRadians);
 
     let yrot = (iter/gui.params.angle_y) * gui.params.foliage_start_at;
-    //object.rotateY( (yrot ) * -PItoDeg );
+    // object.rotateY( (yrot ) * -PItoDeg );
     let y_angle = gui.params.angle_y * scaleRatio;
     object.rotateY( (gui.params.starting_angle_y + y_angle + iter * 200/gui.params.num ) * -PItoDeg );
 
     // as they grow up, they become bigger
     object.scale.set(5 * scaleRatio ,1 ,1);
     object.rotateZ(-(Math.PI/2));
-    //object.rotateY(20);
-
 }
 
 function populatePalm(foliage_geometry, trunk_geometry, selected_material, radius) {
@@ -170,7 +169,7 @@ function render(){
         let amp_decrease = 900;
         gui.params.num = Math.abs(Math.sin(n_frames/200) * amp_decrease);
     }
-    populatePalmOnCurve(
+    populatePalm(
         new LeafGeometry(gui.params.length,
                          gui.params.length_stem,
                          gui.params.width_stem,
@@ -182,7 +181,7 @@ function render(){
                          gui.params.leaf_inclination),
         //geometries[gui.params.foliage_geometry],
         geometries["box"],
-        material, radius, curveGeometry);
+        material, radius);
     if (gui.params.zoetrope) {
         palm.rotateZ(gui.params.zoetrope_angle);
     }

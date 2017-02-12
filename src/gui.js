@@ -50,7 +50,7 @@ export default class Gui extends DAT.GUI{
 
         this.add(this.params, "spread").min(0).max(0.7).step(0.1).listen();
         this.add(this.params, "angle").min(132.0).max(138.0).step(0.01);
-        //this.add(this.params, "num").min(60).max(1200).step(1).listen();
+        this.add(this.params, "num").min(60).max(1200).step(1).listen();
         this.add(this.params, "z_decrease").min(0.04).max(0.25).step(0.01);
         this.add(this.params, "foliage_start_at").min(10).max(320);
 
