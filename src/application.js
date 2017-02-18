@@ -1,9 +1,9 @@
 /* eslint-env browser */
 import * as THREE from 'three';
-import LeafGeometry from './leafGeometry.js';
+import LeafGeometry from './LeafGeometry.js';
 import Stats from 'stats.js';
 import Gui from './gui.js';
-import {phyllotaxisConical, phyllotaxisOnCurve} from './phillotaxis.js';
+import {phyllotaxisConical} from './phillotaxis.js';
 import CollectionGeometries from './geometries.js';
 import CollectionMaterials from './materials.js';
 import {PointLights} from './pointLights.js';
@@ -30,9 +30,9 @@ this.controls = new OrbitControls(camera, renderer.domElement);
 
 //palm group
 var objects = [];
+var leafGeometry = [];
 var palm = new THREE.Group();
 let n_frames = 0;
-let curveGeometry = new THREE.Geometry();
 
 //add lights to the scene
 let ambientLight = new THREE.AmbientLight( 0xa2ac00 );
@@ -51,60 +51,6 @@ window.addEventListener('resize', function() {
     camera.aspect = WIDTH / HEIGHT;
     camera.updateProjectionMatrix();
 });
-
-// curve
-// let curve = createCurve();
-// curveGeometry.vertices = curve.getPoints( gui.params.num );
-// var materialCurve = new THREE.LineBasicMaterial( { color : 0xff0000 } );
-// var curveObject = new THREE.Line( curveGeometry, materialCurve );
-// scene.add(curveObject);
-
-// function createCurve(){
-//     //Create a closed wavey loop
-//     var curve = new THREE.CatmullRomCurve3( [
-// 	      new THREE.Vector3( 0, 0, 0 ),
-// 	      new THREE.Vector3( -10, 0, -30 ),
-// 	      new THREE.Vector3( 10, 0, -100 )
-//     ] );
-//     return curve;
-// }
-// end curve
-
-function populatePalmOnCurve(foliage_geometry, trunk_geometry, selected_material, radius, curve_geometry) {
-    let PItoDeg = (Math.PI/180.0);
-    let angleInRadians = gui.params.angle * PItoDeg;
-    for (var i = 0; i< gui.params.num; i++) {
-        let isALeaf = (i <= gui.params.foliage_start_at)? true : false;
-        let geometry = isALeaf ? foliage_geometry : trunk_geometry;
-        let object = new THREE.Mesh(geometry, selected_material);
-        let coord = phyllotaxisOnCurve(i, angleInRadians, gui.params.spread, curve_geometry);
-        object.position.set(coord.x, coord.y, coord.z);
-
-        //object.lookAt(coord.prev);
-        if (isALeaf) {
-            // if it is a leave, they all should be orientated to they
-            // beginning of the curve
-            if(i!==0){
-                object.lookAt(coord.prev);
-            }else{
-                //object number 0 soffer of gimbal loock
-                // because he's lookingAt is own position probably
-                object.lookAt(coord.prev);
-                object.rotateY( (40 + gui.params.angle_y * 100/gui.params.num ) * -PItoDeg );
-            }
-            transformIntoLeaf(object, i, angleInRadians, radius);
-        } else {
-            object.lookAt(coord.prev);
-            object.rotateZ( i* angleInRadians);
-            object.rotateY( (90 + gui.params.angle_y + i * 100/gui.params.num ) * -PItoDeg );
-        }
-
-        objects.push(object);
-        palm.add(object);
-    }
-    scene.add(palm);
-}
-
 
 function transformIntoLeaf(object, iter, angleInRadians, radius){
     let PItoDeg = (Math.PI/180.0);
@@ -148,6 +94,7 @@ function populatePalm(foliage_geometry, trunk_geometry, selected_material, radiu
 }
 
 function resetPalm(){
+    leafGeometry = [];
     for(var index in objects){
         let object = objects[index];
 			  palm.remove( object );
@@ -158,7 +105,6 @@ function resetPalm(){
 
 function render(){
     stats.begin();
-
     n_frames++;
     let spread;
     if (gui.params.anim_spread) {
@@ -169,7 +115,7 @@ function render(){
         let amp_decrease = 900;
         gui.params.num = Math.abs(Math.sin(n_frames/200) * amp_decrease);
     }
-    populatePalm(
+    leafGeometry.push(
         new LeafGeometry(gui.params.length,
                          gui.params.length_stem,
                          gui.params.width_stem,
@@ -178,8 +124,10 @@ function render(){
                          gui.params.density,
                          gui.params.curvature,
                          gui.params.curvature_border,
-                         gui.params.leaf_inclination),
-        //geometries[gui.params.foliage_geometry],
+                         gui.params.leaf_inclination)
+    );
+    populatePalm(
+        leafGeometry[0],
         geometries["box"],
         material, radius);
     if (gui.params.zoetrope) {
