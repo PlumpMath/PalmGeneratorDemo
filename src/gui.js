@@ -1,5 +1,5 @@
 import DAT from 'dat-gui';
-import {Color, Fog} from 'THREE';
+import {Color, Fog} from 'three';
 
 export default class Gui extends DAT.GUI{
     constructor(material){
@@ -19,7 +19,6 @@ export default class Gui extends DAT.GUI{
 
             starting_angle_open: 50,
             angle_open: 29,
-            bla: 2,
             color: 0x000022,
             emissive: 0x28000,
             specular: 0x445566,

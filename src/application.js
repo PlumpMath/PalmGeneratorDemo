@@ -102,6 +102,20 @@ function resetPalm(){
     scene.remove(palm);
     objects = [];
 }
+function makeLeaf() {
+    let opt = {
+        length: gui.params.length,
+        length_stem: gui.params.length_stem,
+        width_stem: gui.params.width_stem,
+        leaf_width: gui.params.leaf_width,
+        leaf_up: gui.params.leaf_up,
+        density: gui.params.density,
+        curvature: gui.params.curvature,
+        curvature_border: gui.params.curvature_border,
+        leaf_inclination: gui.params.leaf_inclination
+    };
+    return new LeafGeometry(opt);
+}
 
 function render(){
     stats.begin();
@@ -115,17 +129,8 @@ function render(){
         let amp_decrease = 900;
         gui.params.num = Math.abs(Math.sin(n_frames/200) * amp_decrease);
     }
-    leafGeometry.push(
-        new LeafGeometry(gui.params.length,
-                         gui.params.length_stem,
-                         gui.params.width_stem,
-                         gui.params.leaf_width,
-                         gui.params.leaf_up,
-                         gui.params.density,
-                         gui.params.curvature,
-                         gui.params.curvature_border,
-                         gui.params.leaf_inclination)
-    );
+    let leaf = makeLeaf();
+    leafGeometry.push(leaf);
     populatePalm(
         leafGeometry[0],
         geometries["box"],
