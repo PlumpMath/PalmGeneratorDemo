@@ -14,11 +14,11 @@ export default class Gui extends DAT.GUI{
             spread: 0.2,
             angle: 137.5,
             num: 600,
-            z_decrease: 0.05,
+            growth: 0.05,
             foliage_start_at: 30,
 
-            starting_angle_y: 50,
-            angle_y: 29,
+            starting_angle_open: 50,
+            angle_open: 29,
             bla: 2,
             color: 0x000022,
             emissive: 0x28000,
@@ -51,12 +51,12 @@ export default class Gui extends DAT.GUI{
         this.add(this.params, "spread").min(0).max(0.7).step(0.1).listen();
         this.add(this.params, "angle").min(132.0).max(138.0).step(0.01);
         this.add(this.params, "num").min(60).max(1200).step(1).listen();
-        this.add(this.params, "z_decrease").min(0.04).max(0.25).step(0.01);
+        this.add(this.params, "growth").min(0.04).max(0.25).step(0.01);
         this.add(this.params, "foliage_start_at").min(10).max(320);
 
         let foliage = this.addFolder('foliage');
-        foliage.add(this.params, "angle_y").min(0).max(80);
-        foliage.add(this.params, "starting_angle_y").min(50).max(100);
+        foliage.add(this.params, "angle_open").min(0).max(80);
+        foliage.add(this.params, "starting_angle_open").min(50).max(100);
 
         let leaf = this.addFolder('leaf');
         leaf.add(this.params, "length").min(20).max(90).step(1);

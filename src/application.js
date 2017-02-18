@@ -62,10 +62,10 @@ function transformIntoLeaf(object, iter, angleInRadians, radius){
     let scaleRatio = ratio === 0 ? 0.001 : ratio;
     object.rotateZ( iter* angleInRadians);
 
-    let yrot = (iter/gui.params.angle_y) * gui.params.foliage_start_at;
+    let yrot = (iter/gui.params.angle_open) * gui.params.foliage_start_at;
     // object.rotateY( (yrot ) * -PItoDeg );
-    let y_angle = gui.params.angle_y * scaleRatio;
-    object.rotateY( (gui.params.starting_angle_y + y_angle + iter * 200/gui.params.num ) * -PItoDeg );
+    let y_angle = gui.params.angle_open * scaleRatio;
+    object.rotateY( (gui.params.starting_angle_open + y_angle + iter * 200/gui.params.num ) * -PItoDeg );
 
     // as they grow up, they become bigger
     object.scale.set(5 * scaleRatio ,1 ,1);
@@ -79,13 +79,13 @@ function populatePalm(foliage_geometry, trunk_geometry, selected_material, radiu
         let isALeaf = (i <= gui.params.foliage_start_at)? true : false;
         let geometry = isALeaf ? foliage_geometry : trunk_geometry;
         let object = new THREE.Mesh(geometry, selected_material);
-        let coord = phyllotaxisConical(i, angleInRadians, gui.params.spread, gui.params.z_decrease);
+        let coord = phyllotaxisConical(i, angleInRadians, gui.params.spread, gui.params.growth);
         object.position.set(coord.x, coord.y, coord.z);
         if (isALeaf) {
             transformIntoLeaf(object, i, angleInRadians, radius);
         } else {
             object.rotateZ( i* angleInRadians);
-            object.rotateY( (90 + gui.params.angle_y + i * 100/gui.params.num ) * -PItoDeg );
+            object.rotateY( (90 + gui.params.angle_open + i * 100/gui.params.num ) * -PItoDeg );
         }
         objects.push(object);
         palm.add(object);
