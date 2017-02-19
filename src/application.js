@@ -7,11 +7,12 @@ import {phyllotaxisConical} from './phillotaxis.js';
 import CollectionGeometries from './geometries.js';
 import CollectionMaterials from './materials.js';
 import {PointLights} from './pointLights.js';
-const radius = 5; //this number is used to create the geometried and to position the Leafs correctly
+const radius = 5; //this number is used to create the geometries
 const geometries = new CollectionGeometries(radius);
 const materials = new CollectionMaterials;
-const material = materials["lambert"];
+const material = materials["standard"];
 const gui = new Gui(material);
+const debug = true;
 
 //setup the scene and the camera
 const scene = new THREE.Scene();
@@ -23,9 +24,10 @@ document.body.style.margin =0;
 document.body.appendChild(renderer.domElement);
 
 const stats = new Stats();
+
 stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
-document.body.appendChild( stats.dom );
-camera.position.z = 80;
+//document.body.appendChild( stats.dom );
+camera.position.z = 150;
 this.controls = new OrbitControls(camera, renderer.domElement);
 
 //palm group
@@ -35,9 +37,9 @@ var palm = new THREE.Group();
 let n_frames = 0;
 
 //add lights to the scene
-let ambientLight = new THREE.AmbientLight( 0xa2ac00 );
+let ambientLight = new THREE.AmbientLight( 0x34ac0f );
 scene.add( ambientLight );
-renderer.setClearColor( 0x57be92 );
+renderer.setClearColor( 0x505050 );
 gui.addScene(scene, ambientLight, renderer);
 PointLights().map((light) => {
     scene.add( light );
@@ -52,7 +54,9 @@ window.addEventListener('resize', function() {
     camera.updateProjectionMatrix();
 });
 
-function transformIntoLeaf(object, iter, angleInRadians, radius){
+addStats(debug);
+
+function transformIntoLeaf(object, iter, angleInRadians){
     let PItoDeg = (Math.PI/180.0);
     // the scale ratio is a value between 0.001 and 1.
     // It is 0.0001 for the first leaves, and 1 for the last ones
@@ -72,7 +76,7 @@ function transformIntoLeaf(object, iter, angleInRadians, radius){
     object.rotateZ(-(Math.PI/2));
 }
 
-function populatePalm(foliage_geometry, trunk_geometry, selected_material, radius) {
+function populatePalm(foliage_geometry, trunk_geometry, selected_material) {
     let PItoDeg = (Math.PI/180.0);
     let angleInRadians = gui.params.angle * PItoDeg;
     for (var i = 0; i< gui.params.num; i++) {
@@ -82,10 +86,14 @@ function populatePalm(foliage_geometry, trunk_geometry, selected_material, radiu
         let coord = phyllotaxisConical(i, angleInRadians, gui.params.spread, gui.params.growth);
         object.position.set(coord.x, coord.y, coord.z);
         if (isALeaf) {
-            transformIntoLeaf(object, i, angleInRadians, radius);
+            transformIntoLeaf(object, i, angleInRadians);
         } else {
             object.rotateZ( i* angleInRadians);
-            object.rotateY( (90 + gui.params.angle_open + i * 100/gui.params.num ) * -PItoDeg );
+            if (gui.params.trunk_regular) {
+                object.rotateY( (90 + gui.params.angle_open ) * -PItoDeg );
+            }else{
+                object.rotateY( (90 + gui.params.angle_open + i * 100/gui.params.num ) * -PItoDeg );
+            }
         }
         objects.push(object);
         palm.add(object);
@@ -117,6 +125,12 @@ function makeLeaf() {
     return new LeafGeometry(opt);
 }
 
+function addStats(debug) {
+    if (debug) {
+        document.body.appendChild(stats.domElement);
+    }
+}
+
 function render(){
     stats.begin();
     n_frames++;
@@ -125,16 +139,27 @@ function render(){
         let amp_spread = 13;
         gui.params.spread = Math.abs(Math.sin(n_frames/100) * amp_spread);
     }
-    if (gui.params.anim_decrease_objects) {
+    if (gui.params.anim_growth_objects) {
         let amp_decrease = 900;
         gui.params.num = Math.abs(Math.sin(n_frames/200) * amp_decrease);
+    }
+    if (gui.params.zoom_x) {
+        camera.position.x = Math.abs(Math.sin(n_frames/gui.params.zoom_velocity) * gui.params.zoom_amplitude);
+    }
+
+    if (gui.params.zoom_y) {
+        camera.position.y = Math.sin(n_frames/gui.params.zoom_velocity) * gui.params.zoom_amplitude;
+    }
+
+    if (gui.params.zoom_z) {
+        camera.position.z = Math.abs(Math.sin(n_frames/gui.params.zoom_velocity) * gui.params.zoom_amplitude);
     }
     let leaf = makeLeaf();
     leafGeometry.push(leaf);
     populatePalm(
         leafGeometry[0],
         geometries["box"],
-        material, radius);
+        material);
     if (gui.params.zoetrope) {
         palm.rotateZ(gui.params.zoetrope_angle);
     }

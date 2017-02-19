@@ -11,53 +11,55 @@ export default class Gui extends DAT.GUI{
         );
         this.material = material;
         this.params = {
-            spread: 0.2,
+            spread: 0.1,
             angle: 137.5,
-            num: 600,
-            growth: 0.05,
-            foliage_start_at: 30,
-
-            starting_angle_open: 50,
-            angle_open: 29,
-            color: 0x000022,
-            emissive: 0x28000,
-            specular: 0x445566,
-            shininess: 50,
-
-            length:50,
-            length_stem:4,
-            width_stem:0.5,
-            leaf_width:0.5,
-            leaf_up:1.5,
-            density:30,
-            curvature: 0.03,
+            num: 406,
+            growth: 0.12,
+            foliage_start_at: 40,
+            trunk_regular: false,
+            angle_open: 36.17438258159361,
+            starting_angle_open: 47,
+            length: 50,
+            length_stem: 20,
+            width_stem: 0.2,
+            leaf_width: 0.8,
+            leaf_up: 1.5,
+            density: 11,
+            curvature: 0.04,
             curvature_border: 0.005,
-            leaf_inclination: 0.2,
-
+            leaf_inclination: 0.9,
 
             anim_spread: false,
-            anim_decrease_objects: false,
+            zoom_x: false,
+            zoom_y: false,
+            zoom_z: false,
+            zoom_amplitude: 20,
+            zoom_velocity: 100,
+            anim_growth_objects: false,
             zoetrope_rotation: 137.035,
             zoetrope:false,
             zoetrope_angle:139.71,
 
-            backgroundColor:"#57be92",
-            ambientLight:"#cf9e00"
+            color: 0xefff00,
+            emissive: 0x4ca078,
+            roughness:0.55,
+            metalness:0.89,
+            backgroundColor:"#505050",
+            ambientLight:"#34ac0f"
         };
-        //this.remember(this.params);
-
+        this.remember(this.params);
 
         this.add(this.params, "spread").min(0).max(0.7).step(0.1).listen();
         this.add(this.params, "angle").min(132.0).max(138.0).step(0.01);
         this.add(this.params, "num").min(60).max(1200).step(1).listen();
         this.add(this.params, "growth").min(0.04).max(0.25).step(0.01);
         this.add(this.params, "foliage_start_at").min(10).max(320);
+        this.add(this.params, "angle_open").min(0).max(80);
+        this.add(this.params, "starting_angle_open").min(50).max(100);
+        this.add(this.params, "trunk_regular");
 
-        let foliage = this.addFolder('foliage');
-        foliage.add(this.params, "angle_open").min(0).max(80);
-        foliage.add(this.params, "starting_angle_open").min(50).max(100);
-
-        let leaf = this.addFolder('leaf');
+        let leaf = this.addFolder('leaf Geometry');
+        leaf.closed=true;
         leaf.add(this.params, "length").min(20).max(90).step(1);
         leaf.add(this.params, "length_stem").min(2).max(40).step(1);
         leaf.add(this.params, "width_stem").min(0.2).max(2.4).step(0.1);
@@ -69,14 +71,21 @@ export default class Gui extends DAT.GUI{
         leaf.add(this.params, "leaf_inclination").min(0.1).max(1.0).step(0.1);
 
         let mat = this.addFolder('Material');
+        mat.closed=true;
         mat.addColor(this.params, 'color' ).onChange( this._handleColorChange( this.material.color ) );
         mat.addColor(this.params, 'emissive' ).onChange( this._handleColorChange( this.material.emissive ) );
-        mat.addColor(this.params, 'specular' ).onChange( this._handleColorChange( this.material.specular ) );
-        mat.add(this.params, 'shininess', 0, 100).onChange( (val)=>{this.material.shininess = val;});
+        mat.add(this.params, 'metalness', 0.0, 1.0).onChange( (val)=>{this.material.metalness = val;});
+        mat.add(this.params, 'roughness', 0.0, 1.0).onChange( (val)=>{this.material.roughness = val;});
 
         let anim = this.addFolder('animation');
+        anim.closed=true;
         anim.add(this.params, "anim_spread");
-        anim.add(this.params, "anim_decrease_objects");
+        anim.add(this.params, "zoom_x");
+        anim.add(this.params, "zoom_y");
+        anim.add(this.params, "zoom_z");
+        anim.add(this.params, "zoom_amplitude").min(2).max(100).step(1);
+        anim.add(this.params, "zoom_velocity").min(40).max(300).step(1);
+        anim.add(this.params, "anim_growth_objects");
         anim.add(this.params, "zoetrope");
         anim.add(this.params, "zoetrope_angle").min(130).max(150).step(0.01);
     }
@@ -84,9 +93,7 @@ export default class Gui extends DAT.GUI{
     // credtis to these methods goes to Greg Tatum https://threejs.org/docs/scenes/js/material.js
     addScene ( scene, ambientLight, renderer ) {
 	      let folder = this.addFolder('Scene');
-	      let data = {
-	      };
-
+        folder.closed=true;
 	      let color = new Color();
 	      let colorConvert = this._handleColorChange( color );
 
