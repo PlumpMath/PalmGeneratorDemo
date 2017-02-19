@@ -80,11 +80,11 @@ export default class Gui extends DAT.GUI{
         let anim = this.addFolder('animation');
         anim.closed=true;
         anim.add(this.params, "anim_spread");
-        anim.add(this.params, "zoom_x");
-        anim.add(this.params, "zoom_y");
-        anim.add(this.params, "zoom_z");
-        anim.add(this.params, "zoom_amplitude").min(2).max(100).step(1);
-        anim.add(this.params, "zoom_velocity").min(40).max(300).step(1);
+        // anim.add(this.params, "zoom_x");
+        // anim.add(this.params, "zoom_y");
+        // anim.add(this.params, "zoom_z");
+        // anim.add(this.params, "zoom_amplitude").min(2).max(500).step(1);
+        // anim.add(this.params, "zoom_velocity").min(40).max(300).step(1);
         anim.add(this.params, "anim_growth_objects");
         anim.add(this.params, "zoetrope");
         anim.add(this.params, "zoetrope_angle").min(130).max(150).step(0.01);

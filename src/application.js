@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import LeafGeometry from './LeafGeometry.js';
 import Stats from 'stats.js';
 import Gui from './gui.js';
-import {phyllotaxisConical} from './phillotaxis.js';
+import {phyllotaxisConical} from './phyllotaxis.js';
 import CollectionGeometries from './geometries.js';
 import CollectionMaterials from './materials.js';
 import {PointLights} from './pointLights.js';
@@ -12,7 +12,7 @@ const geometries = new CollectionGeometries(radius);
 const materials = new CollectionMaterials;
 const material = materials["standard"];
 const gui = new Gui(material);
-const debug = true;
+const debug = false;
 
 //setup the scene and the camera
 const scene = new THREE.Scene();
@@ -53,6 +53,7 @@ window.addEventListener('resize', function() {
     camera.aspect = WIDTH / HEIGHT;
     camera.updateProjectionMatrix();
 });
+window.addEventListener('keypress', maybeGuiPressed, false);
 
 addStats(debug);
 
@@ -130,6 +131,12 @@ function addStats(debug) {
         document.body.appendChild(stats.domElement);
     }
 }
+
+var maybeGuiPressed = function(ev) {
+    if ( ev.keyCode === 103) {
+        gui.toggleHide();
+    }
+};
 
 function render(){
     stats.begin();
